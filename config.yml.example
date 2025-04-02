@@ -1,4 +1,4 @@
-# 个人信息助理系统配置文件
+# insight flow 配置文件
 
 database:
   mongodb:

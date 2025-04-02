@@ -8,8 +8,8 @@ NC='\033[0m' # No Color
 
 # 帮助信息
 function show_help {
-  echo -e "${BLUE}个人信息助理系统控制脚本${NC}"
-  echo "用法: ./assistctl.sh [命令]"
+  echo -e "${BLUE}InsightFlow系统控制脚本${NC}"
+  echo "用法: ./insightctl.sh [命令]"
   echo ""
   echo "可用命令:"
   echo "  start       启动所有服务"

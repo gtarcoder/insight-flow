@@ -49,9 +49,9 @@ export const RELATION_TYPE_MAP = {
 
 // 本地存储键
 export const STORAGE_KEYS = {
-    authToken: 'personal_info_assistant_auth_token',
-    userPreferences: 'personal_info_assistant_preferences',
-    recentSearches: 'personal_info_assistant_recent_searches'
+    authToken: 'insight_flow_auth_token',
+    userPreferences: 'insight_flow_preferences',
+    recentSearches: 'insight_flow_recent_searches'
 };
 
 // 时间范围选项
