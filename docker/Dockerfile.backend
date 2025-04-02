@@ -1,1 +1,30 @@
-# 不需要修改具体内容，只需重命名文件位置 
+FROM python:3.9-slim
+
+WORKDIR /app
+
+# 安装系统依赖
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip config set global.index-url https://mirrors.aliyun.com/pypi/simple && \
+    pip config set install.trusted-host mirrors.aliyun.com
+
+# 复制依赖文件并安装
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 复制源代码
+COPY src/ /app/src/
+COPY config.yml.example /app/config.yml.example
+
+# 设置Python路径
+ENV PYTHONPATH=/app
+
+# 设置命令 - 使用入口脚本同时运行API和爬虫
+CMD ["python", "-m", "src.app", "--run-api", "--run-crawler"]
+
+# 暴露端口
+EXPOSE 8000 

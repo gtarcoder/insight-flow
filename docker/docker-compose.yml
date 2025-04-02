@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # MongoDB服务
   mongodb:
@@ -63,7 +61,7 @@ services:
   # 后端API服务
   backend:
     build:
-      context: .
+      context: ..
       dockerfile: ./docker/Dockerfile.backend
     container_name: insight-api
     restart: unless-stopped
@@ -94,16 +92,14 @@ services:
   # 前端服务
   frontend:
     build:
-      context: ./frontend
-      dockerfile: ../docker/Dockerfile.frontend
-      args:
-        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      context: ..
+      dockerfile: ./docker/Dockerfile.frontend
     container_name: insight-web
     restart: unless-stopped
     depends_on:
       - backend
     ports:
-      - "3000:3000"
+      - "3001:3000"
     networks:
       - app-network
 

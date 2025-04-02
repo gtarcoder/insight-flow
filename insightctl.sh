@@ -21,6 +21,7 @@ function show_help {
   echo "  log-frontend 查看前端日志"
   echo "  dev         以开发模式启动"
   echo "  update      更新并重建服务"
+  echo "  rebuild     重新构建所有服务"
 }
 
 # 主函数
@@ -62,6 +63,10 @@ case "$1" in
     git pull
     docker-compose -f docker/docker-compose.yml down
     docker-compose -f docker/docker-compose.yml up -d --build
+    ;;
+  rebuild)
+    echo -e "${GREEN}重新构建所有服务...${NC}"
+    docker-compose -f docker/docker-compose.yml build
     ;;
   *)
     show_help

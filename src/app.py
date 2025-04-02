@@ -4,6 +4,7 @@
 import argparse
 import sys
 import logging
+import subprocess
 from config.config import Config
 from crawler.scheduler import CrawlerScheduler
 from notifier.push_manager import PushManager
@@ -28,6 +29,7 @@ def main():
     parser = argparse.ArgumentParser(description='个人信息助理系统')
     parser.add_argument('--config', type=str, default='config.yml', help='配置文件路径')
     parser.add_argument('--run-crawler', action='store_true', help='运行爬虫调度器')
+    parser.add_argument('--run-api', action='store_true', help='运行API服务')
     args = parser.parse_args()
     
     # 加载配置
@@ -37,6 +39,17 @@ def main():
     except Exception as e:
         logger.error(f"加载配置文件失败: {e}")
         return
+    
+    # 如果指定了运行API服务
+    if args.run_api:
+        logger.info("启动API服务...")
+        try:
+            # 导入并运行FastAPI应用
+            import uvicorn
+            uvicorn.run("src.api.main:app", host="0.0.0.0", port=8000)
+        except Exception as e:
+            logger.error(f"启动API服务失败: {e}")
+            return
     
     # 初始化推送管理器
     push_manager = PushManager()
@@ -71,14 +84,10 @@ def main():
     
     # 运行爬虫调度器
     if args.run_crawler:
-        crawler_scheduler = CrawlerScheduler()
-        logger.info("启动爬虫调度器")
-        try:
-            crawler_scheduler.schedule_all()
-        except KeyboardInterrupt:
-            logger.info("用户终止爬虫运行")
-        except Exception as e:
-            logger.error(f"爬虫运行出错: {e}")
+        logger.info("启动爬虫调度器...")
+        crawler_config = config.get_crawler_config()
+        scheduler = CrawlerScheduler(crawler_config, push_manager)
+        scheduler.start()
     
     logger.info("系统初始化完成")
 
