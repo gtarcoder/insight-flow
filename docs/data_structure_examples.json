@@ -1,0 +1,141 @@
+{
+    "mongodb_content_example": {
+        "_id": "60a5e8a9b54b12c5a8c4d786",
+        "title": "人工智能在医疗领域的应用",
+        "original_content": "随着人工智能技术的发展，其在医疗领域的应用越来越广泛...[完整内容]",
+        "processed_text": "本文介绍了AI在医疗领域的几个主要应用方向...[处理后内容]",
+        "summary": "本文总结了AI在医疗诊断、药物研发和健康管理三个领域的应用进展。",
+        "source": "微信公众号-AI前沿",
+        "platform": "wechat",
+        "publish_time": {
+            "$date": "2023-05-20T08:30:00Z"
+        },
+        "formatted_time": "2023-05-20 16:30:00",
+        "crawl_time": {
+            "$date": "2023-05-20T09:15:27Z"
+        },
+        "topics": [
+            "人工智能",
+            "医疗",
+            "技术应用"
+        ],
+        "keywords": [
+            "AI",
+            "医疗诊断",
+            "辅助决策",
+            "医学影像"
+        ],
+        "sentiment": {
+            "score": 0.65,
+            "label": "positive",
+            "emotions": {
+                "joy": 0.3,
+                "trust": 0.7,
+                "anticipation": 0.4
+            }
+        },
+        "entities": [
+            {
+                "text": "人工智能",
+                "type": "TECHNOLOGY",
+                "start": 2,
+                "end": 6
+            },
+            {
+                "text": "医疗诊断",
+                "type": "CONCEPT",
+                "start": 15,
+                "end": 19
+            }
+        ],
+        "metadata": {
+            "word_count": 1250,
+            "read_time_minutes": 6,
+            "author": "张三",
+            "original_url": "https://example.com/article/123",
+            "image_urls": [
+                "https://example.com/images/1.jpg",
+                "https://example.com/images/2.jpg"
+            ]
+        },
+        "value_assessment": {
+            "overall_score": 8.5,
+            "relevance": 9.0,
+            "timeliness": 8.0,
+            "importance": 8.5,
+            "uniqueness": 7.5
+        },
+        "user_interactions": {
+            "view_count": 3,
+            "last_viewed": {
+                "$date": "2023-05-25T14:20:00Z"
+            },
+            "is_favorited": true,
+            "tags": [
+                "重要",
+                "收藏"
+            ]
+        }
+    },
+    "qdrant_vector_example": {
+        "id": "60a5e8a9b54b12c5a8c4d786",
+        "vector": [
+            0.12,
+            0.45,
+            0.68,
+            0.92,
+            -0.13
+        ],
+        "payload": {
+            "content_id": "60a5e8a9b54b12c5a8c4d786",
+            "title": "人工智能在医疗领域的应用",
+            "platform": "wechat",
+            "publish_time": "2023-05-20T08:30:00Z",
+            "topics": [
+                "人工智能",
+                "医疗",
+                "技术应用"
+            ],
+            "summary": "本文总结了AI在医疗诊断、药物研发和健康管理三个领域的应用进展。"
+        }
+    },
+    "neo4j_cypher_examples": [
+        "// 创建内容节点",
+        "CREATE (c:Content {",
+        "  id: '60a5e8a9b54b12c5a8c4d786',",
+        "  title: '人工智能在医疗领域的应用',",
+        "  platform: 'wechat',",
+        "  publish_time: '2023-05-20T08:30:00Z'",
+        "})",
+        "// 创建主题节点",
+        "CREATE (t:Topic {",
+        "  name: '人工智能',",
+        "  category: '技术'",
+        "})",
+        "// 创建实体节点",
+        "CREATE (e:Entity {",
+        "  name: '医疗诊断',",
+        "  type: 'CONCEPT'",
+        "})",
+        "// 创建关系",
+        "CREATE (c)-[:BELONGS_TO]->(t)",
+        "CREATE (c)-[:MENTIONS]->(e)",
+        "// 内容之间的关系",
+        "MATCH (c1:Content {id: '60a5e8a9b54b12c5a8c4d786'})",
+        "MATCH (c2:Content {id: '60a5e8a9b54b12c5a8c4d787'})",
+        "CREATE (c1)-[:CAUSES {",
+        "  description: 'AI技术进步导致了医疗诊断效率提高',",
+        "  strength: 0.85",
+        "}]->(c2)",
+        "// 时序关系",
+        "CREATE (c1)-[:FOLLOWS {",
+        "  time_gap: '3 days',",
+        "  description: '后续进展'",
+        "}]->(c2)",
+        "// 矛盾关系",
+        "CREATE (c1)-[:CONTRADICTS {",
+        "  description: '提出了不同观点',",
+        "  degree: 0.7",
+        "}]->(c2)"
+    ]
+}

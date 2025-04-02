@@ -1,0 +1,58 @@
+# 个人信息助理系统配置文件
+
+database:
+  mongodb:
+    uri: "mongodb://localhost:27017"
+  qdrant:
+    url: "http://localhost:6333"
+  neo4j:
+    uri: "bolt://localhost:7687"
+    username: "neo4j"
+    password: "password"
+
+crawlers:
+  wechat:
+    enabled: true
+    accounts: ["account1", "account2"]
+    schedule: "08:00"
+  weibo:
+    enabled: true
+    topics: ["热搜榜", "科技"]
+    schedule: "12:00"
+  xiaohongshu:
+    enabled: true
+    categories: ["潮流", "美食"]
+    schedule: "18:00"
+  bilibili:
+    enabled: true
+    categories: ["科技", "知识"]
+    schedule: "20:00"
+
+llm:
+  provider: "openai"
+  api_key: "your-openai-api-key"
+  model: "gpt-4"
+  embedding_model: "text-embedding-ada-002"
+
+push_channels:
+  wechat:
+    enabled: true
+    app_id: "your-app-id"
+    app_secret: "your-app-secret"
+    template_id: "your-template-id"
+    openid: "user-openid"
+  email:
+    enabled: true
+    smtp_server: "smtp.gmail.com"
+    smtp_port: 587
+    sender_email: "your-email@gmail.com"
+    sender_password: "your-email-password"
+    recipient_email: "recipient@example.com"
+  dingtalk:
+    enabled: false
+    webhook_url: "your-webhook-url"
+    secret: "your-secret"
+
+scheduler:
+  task_queue: "redis"
+  redis_url: "redis://localhost:6379/0" 

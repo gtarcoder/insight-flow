@@ -1,0 +1,8 @@
+**/**/__pycache__
+file:*
+.pytest_cache
+**/*.sqlite
+data.db
+.DS_Store
+pdf_parser.log
+*.csv
