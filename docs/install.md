@@ -208,6 +208,48 @@ docker cp insight-neo4j:/data/backup.dump ~/neo4j_backups/backup_$(date +%Y%m%d)
 如果在Mac上遇到内存问题，可在Docker Desktop中增加分配的内存资源:
 Docker Desktop → Settings → Resources → Memory
 
+## 配置系统
+
+InsightFlow 使用两种配置机制：
+
+1. **config.yml**: 主要配置文件，包含所有应用配置
+2. **环境变量**: 可以覆盖配置文件中的设置，适合容器环境
+
+### 配置优先级
+
+1. 环境变量 (最高优先级)
+2. config.yml 文件
+3. 默认值 (最低优先级)
+
+### 环境变量映射
+
+以下环境变量可以覆盖相应的配置项：
+
+| 环境变量 | 配置文件路径 | 说明 |
+|---------|------------|------|
+| MONGODB_URI | database.mongodb.uri | MongoDB连接字符串 |
+| NEO4J_URI | database.neo4j.uri | Neo4j连接URI |
+| NEO4J_USER | database.neo4j.username | Neo4j用户名 |
+| NEO4J_PASSWORD | database.neo4j.password | Neo4j密码 |
+| REDIS_URI | scheduler.redis_url | Redis连接URI |
+| QDRANT_HOST | database.qdrant.url | Qdrant服务器URL |
+| OPENAI_API_KEY | llm.api_key | OpenAI API密钥 |
+| WECHAT_APP_ID | push_channels.wechat.app_id | 微信小程序ID |
+| WECHAT_APP_SECRET | push_channels.wechat.app_secret | 微信小程序密钥 |
+| SECRET_KEY | security.secret_key | 应用安全密钥 |
+
+### 验证配置
+
+使用以下命令验证配置是否有效：
+
+```bash
+./insightctl.sh validate-config
+```
+
+### 配置文件示例
+
+详细的配置结构请参考 `config.yml.example` 文件。
+
 ## 结语
 
 现在您已经成功在Mac上部署InsightFlow系统。通过`insightctl.sh`脚本，您可以轻松管理系统的各个方面。如有问题，请查阅项目文档或提交Issue获取支持。 

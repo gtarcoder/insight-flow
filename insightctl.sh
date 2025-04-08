@@ -22,12 +22,29 @@ function show_help {
   echo "  dev         以开发模式启动"
   echo "  update      更新并重建服务"
   echo "  rebuild     重新构建所有服务"
+  echo "  validate-config 验证配置文件"
 }
 
 # 主函数
 case "$1" in
   start)
     echo -e "${GREEN}启动所有服务...${NC}"
+    # 检查配置文件是否存在
+    if [ ! -f "config.yml" ]; then
+      echo -e "${BLUE}config.yml 文件不存在，从示例创建...${NC}"
+      cp config.yml.example config.yml
+      echo -e "${YELLOW}请编辑 config.yml 文件填入必要的配置信息${NC}"
+      exit 1
+    fi
+    
+    # 先验证配置
+    echo -e "${BLUE}验证配置...${NC}"
+    bash ./insightctl.sh validate-config
+    if [ $? -ne 0 ]; then
+      echo -e "${RED}配置验证失败，请修正后重试${NC}"
+      exit 1
+    fi
+    
     docker-compose -f docker/docker-compose.yml up -d
     ;;
   stop)
@@ -67,6 +84,17 @@ case "$1" in
   rebuild)
     echo -e "${GREEN}重新构建所有服务...${NC}"
     docker-compose -f docker/docker-compose.yml build
+    ;;
+  validate-config)
+    echo -e "${GREEN}验证配置文件...${NC}"
+    # 检查配置文件是否存在
+    if [ ! -f "config.yml" ]; then
+      echo -e "${RED}config.yml 文件不存在，请从 config.yml.example 创建${NC}"
+      exit 1
+    fi
+    
+    # 运行配置验证
+    docker-compose -f docker/docker-compose.yml run --rm backend python -m src.app --validate-only --config /app/config.yml
     ;;
   *)
     show_help

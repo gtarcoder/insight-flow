@@ -10,10 +10,9 @@ from pymongo import MongoClient, DESCENDING, ASCENDING
 from pymongo.collection import Collection
 from pymongo.database import Database
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams, PointStruct, SearchResult
+from qdrant_client.http import models
 from neo4j import GraphDatabase
 
-from config.config import Config
 from storage.models import Content, UserConfig, Relationship, VectorEmbedding
 
 logger = logging.getLogger(__name__)
@@ -22,12 +21,24 @@ logger = logging.getLogger(__name__)
 class DatabaseManager:
     """数据库管理器，统一管理三种不同类型的数据库连接"""
     
-    def __init__(self, config: Config):
-        """初始化数据库连接"""
-        db_config = config.get_database_config()
+    def __init__(self, config=None):
+        """初始化数据库连接
         
+        Args:
+            config: 配置对象，如果为None则从config模块导入配置
+        """
+        assert config is not None, "配置对象不能为None"
+        # 使用传入的配置对象
+        db_config = config.get_database_config()
+        mongo_uri = db_config['mongo_uri']
+        qdrant_url = db_config['qdrant_url']
+        neo4j_uri = db_config['neo4j_uri']
+        neo4j_user = db_config['neo4j_user']
+        neo4j_password = db_config['neo4j_password']
+
+            
         # MongoDB连接
-        self.mongo_client = MongoClient(db_config['mongo_uri'])
+        self.mongo_client = MongoClient(mongo_uri)
         self.db: Database = self.mongo_client.personal_assistant
         self.contents: Collection = self.db.contents
         self.user_configs: Collection = self.db.user_configs
@@ -36,13 +47,13 @@ class DatabaseManager:
         self._create_mongodb_indexes()
         
         # Qdrant连接
-        self.vector_db = QdrantClient(url=db_config['qdrant_url'])
+        self.vector_db = QdrantClient(url=qdrant_url)
         self._init_qdrant_collections()
         
         # Neo4j连接
         self.graph_db = GraphDatabase.driver(
-            db_config['neo4j_uri'],
-            auth=(db_config['neo4j_user'], db_config['neo4j_password'])
+            neo4j_uri,
+            auth=(neo4j_user, neo4j_password)
         )
         
         logger.info("数据库管理器初始化完成")
@@ -72,7 +83,7 @@ class DatabaseManager:
                 # 创建内容向量集合，使用1536维 (OpenAI ada-002模型)
                 self.vector_db.create_collection(
                     collection_name="content_vectors",
-                    vectors_config=VectorParams(size=1536, distance=Distance.COSINE)
+                    vectors_config=models.VectorParams(size=1536, distance=models.Distance.COSINE)
                 )
                 logger.info("Qdrant 'content_vectors'集合创建完成")
         except Exception as e:
@@ -99,7 +110,7 @@ class DatabaseManager:
         self.vector_db.upsert(
             collection_name="content_vectors",
             points=[
-                PointStruct(
+                models.PointStruct(
                     id=embedding.content_id,
                     vector=embedding.vector,
                     payload=embedding.payload
@@ -168,7 +179,7 @@ class DatabaseManager:
         
         return results
     
-    def search_similar_vectors(self, vector: List[float], limit: int = 10) -> List[SearchResult]:
+    def search_similar_vectors(self, vector: List[float], limit: int = 10) -> List[Any]:
         """搜索相似向量"""
         results = self.vector_db.search(
             collection_name="content_vectors",

@@ -29,9 +29,9 @@ crawlers:
     schedule: "20:00"
 
 llm:
-  provider: "openai"
-  base_url: "https://api.openai.com/v1"
-  api_key: "your-openai-api-key"
+  provider: "siliconflow"
+  base_url: "https://api.siliconflow.cn/v1"
+  api_key: "sk-ojazcjjzsjlmwikecmihbgbjvwhfmgroiupxmvhysuhvtazh"
   model: "gpt-4"
   embedding_model: "text-embedding-ada-002"
   default_model: "gpt-4"

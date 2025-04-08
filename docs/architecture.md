@@ -164,49 +164,73 @@ classDiagram
 ### 3. 数据存储层
 ```mermaid
 classDiagram
-    class StorageManager {
+    class DatabaseManager {
         -MongoClient mongo_client
         -QdrantClient vector_db
         -GraphDatabase graph_db
-        +store_content(content_data)
+        +store_content(content)
         +store_vector(content_id, vector)
-        +create_relation(source_id, target_id, relation_type, properties)
-        +query_content(query, limit)
-        +search_similar(vector, limit)
+        +create_relation(relationship)
+        +get_content(content_id)
+        +get_contents(query, limit)
+        +search_similar_vectors(vector, limit)
         +get_relationships(content_id, relationship_type, direction)
+        +close()
     }
     
     class ContentRepository {
-        -StorageManager storage_manager
+        -DatabaseManager db_manager
         +save(content)
         +find_by_id(id)
         +find_by_criteria(criteria)
         +update(id, updates)
         +delete(id)
-        +get_by_platform(platform)
-        +get_by_timeframe(start_time, end_time)
     }
     
     class VectorRepository {
-        -StorageManager storage_manager
-        +store_embedding(content_id, embedding)
-        +find_similar(embedding, limit)
-        +update_embedding(content_id, new_embedding)
-        +delete_embedding(content_id)
+        -DatabaseManager db_manager
+        +save_vector(content_id, vector, metadata)
+        +search_similar(vector, limit)
+        +delete_vector(content_id)
     }
     
-    class RelationshipRepository {
-        -StorageManager storage_manager
-        +create_relationship(from_id, to_id, type, properties)
-        +find_related(content_id, relation_type)
-        +get_causal_chain(start_id, max_depth)
-        +get_temporal_sequence(content_id)
-        +get_topic_cluster(topic_id)
+    class GraphRepository {
+        -DatabaseManager db_manager
+        +create_relationship(source_id, target_id, type, properties)
+        +find_relationships(content_id, types, direction)
+        +delete_relationship(relationship_id)
+        +find_connected(content_id, depth)
     }
     
-    ContentRepository "1" *-- "1" StorageManager
-    VectorRepository "1" *-- "1" StorageManager
-    RelationshipRepository "1" *-- "1" StorageManager
+    class Content {
+        +String id
+        +String title
+        +String original_content
+        +String processed_text
+        +String summary
+        +String source
+        +String platform
+        +DateTime publish_time
+        +Array topics
+        +Array keywords
+        +Map sentiment
+        +Array entities
+        +Map metadata
+        +Map value_assessment
+    }
+    
+    class Relationship {
+        +String source_id
+        +String target_id
+        +String relation_type
+        +Map properties
+    }
+    
+    DatabaseManager <-- ContentRepository
+    DatabaseManager <-- VectorRepository
+    DatabaseManager <-- GraphRepository
+    ContentRepository --> Content
+    GraphRepository --> Relationship
 ```
 
 ### 4. 检索查询层
@@ -252,7 +276,7 @@ classDiagram
 ```mermaid
 classDiagram
     class RelationshipAnalyzer {
-        -StorageManager storage
+        -DatabaseManager storage
         -LLMProcessor llm
         +analyze_connections(new_content_id)
         +find_similar_contents(content)
@@ -266,7 +290,7 @@ classDiagram
     
     class CausalReasoner {
         -LLMProcessor llm
-        -StorageManager storage
+        -DatabaseManager storage
         +identify_causal_relations(content_id)
         +build_causal_chain(start_id, end_id)
         +evaluate_causal_strength(relation_id)
@@ -275,7 +299,7 @@ classDiagram
     }
     
     class TemporalAnalyzer {
-        -StorageManager storage
+        -DatabaseManager storage
         +build_timeline(topic_id)
         +identify_time_patterns(content_ids)
         +detect_periodic_events(content_type)
@@ -300,7 +324,7 @@ classDiagram
 ```mermaid
 classDiagram
     class GraphVisualizer {
-        -StorageManager storage
+        -DatabaseManager storage
         +generate_relationship_graph(central_content_id, depth)
         +generate_knowledge_graph(topic_id)
         +generate_timeline(start_date, end_date, filters)

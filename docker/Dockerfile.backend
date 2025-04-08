@@ -21,10 +21,10 @@ COPY src/ /app/src/
 COPY config.yml.example /app/config.yml.example
 
 # 设置Python路径
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app:/app/src:$PYTHONPATH
 
 # 设置命令 - 使用入口脚本同时运行API和爬虫
 CMD ["python", "-m", "src.app", "--run-api", "--run-crawler"]
 
 # 暴露端口
-EXPOSE 8000 
+EXPOSE 8000

@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from src.crawler.wechat import WeChatCrawler
-from src.crawler.weibo import WeiboCrawler
-from src.crawler.xiaohongshu import XiaoHongShuCrawler
-from src.crawler.bilibili import BiliBiliCrawler
+from crawler.wechat import WeChatCrawler
+from crawler.weibo import WeiboCrawler
+from crawler.xiaohongshu import XiaoHongShuCrawler
+from crawler.bilibili import BiliBiliCrawler
 
 class TestCrawlers(unittest.TestCase):
     """爬虫测试类"""

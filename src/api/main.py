@@ -9,10 +9,11 @@ from pydantic import BaseModel
 from typing import List, Dict, Optional, Any
 
 # 导入必要的模块
-from src.processor.llm_processor import LLMProcessor
-from src.storage.database_manager import DatabaseManager
-from src.analyzer.relationship_analyzer import RelationshipAnalyzer
-from src.visualizer.graph_generator import GraphVisualizer
+from processor.llm_processor import LLMProcessor
+from storage.database_manager import DatabaseManager
+from analyzer.relationship_analyzer import RelationshipAnalyzer
+from visualizer.graph_generator import GraphVisualizer
+from config.config import Config
 
 # 配置日志
 logging.basicConfig(
@@ -39,16 +40,21 @@ app.add_middleware(
 
 # 依赖项注入 - 数据库管理器
 def get_db_manager():
-    db_manager = DatabaseManager()
+    config = Config()  # 创建配置对象
+    db_manager = DatabaseManager(config=config)
     try:
         yield db_manager
     finally:
-        # 如有需要可以在这里添加清理代码
-        pass
+        db_manager.close()  # 确保关闭连接
 
 # 依赖项注入 - LLM处理器
 def get_llm_processor():
-    return LLMProcessor()
+    try:
+        config = Config()  # 创建配置对象
+        return LLMProcessor(config=config)  # 传入配置对象
+    except Exception as e:
+        logger.error(f"LLM处理器初始化失败: {e}")
+        raise HTTPException(status_code=500, detail=f"LLM处理器初始化失败: {str(e)}")
 
 # 数据模型
 class ContentBase(BaseModel):
@@ -172,8 +178,9 @@ async def search_contents(
 async def get_relationships(
     content_id: str,
     depth: int = 2,
-    analyzer: RelationshipAnalyzer = Depends(lambda: RelationshipAnalyzer()),
-    visualizer: GraphVisualizer = Depends(lambda: GraphVisualizer())
+    db_manager: DatabaseManager = Depends(get_db_manager),
+    analyzer: RelationshipAnalyzer = Depends(lambda db=Depends(get_db_manager): RelationshipAnalyzer(db)),
+    visualizer: GraphVisualizer = Depends(lambda db=Depends(get_db_manager): GraphVisualizer(db))
 ):
     """获取内容的关系图"""
     try:
@@ -189,4 +196,4 @@ async def get_relationships(
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
-    uvicorn.run("src.api.main:app", host="0.0.0.0", port=8000, reload=True) 
+    uvicorn.run("api.main:app", host="0.0.0.0", port=8000, reload=True) 

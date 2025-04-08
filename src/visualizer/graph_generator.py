@@ -1,21 +1,26 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib
+import time
 matplotlib.use('Agg')  # 非交互式后端
-from storage.database import StorageManager
 
 class GraphVisualizer:
-    def __init__(self):
-        self.storage = StorageManager()
+    def __init__(self, db_manager):
+        """初始化图可视化工具
+        
+        Args:
+            db_manager: 必须提供的数据库管理器实例
+        """
+        assert db_manager is not None, "必须提供数据库管理器"
+        self.db_manager = db_manager
     
     def generate_relationship_graph(self, central_content_id, depth=2):
         """生成以特定内容为中心的关系图"""
         # 查询图数据库获取关系数据
-        with self.storage.graph_db.session() as session:
+        with self.db_manager.graph_db.session() as session:
             result = session.run(
                 """
-                MATCH path = (c)-[*1..{depth}]-(related)
-                WHERE ID(c) = $content_id
+                MATCH path = (c:Content {id: $content_id})-[*1..{depth}]-(related)
                 RETURN path
                 """,
                 content_id=central_content_id,
@@ -27,8 +32,9 @@ class GraphVisualizer:
             edge_labels = {}
             
             # 添加中心节点
-            central_content = self.storage.content_db.find_one({"_id": central_content_id})
-            G.add_node(central_content_id, label=central_content["title"])
+            central_content = self.db_manager.get_content(central_content_id)
+            if central_content:
+                G.add_node(central_content_id, label=central_content.title)
             
             for record in result:
                 path = record["path"]
